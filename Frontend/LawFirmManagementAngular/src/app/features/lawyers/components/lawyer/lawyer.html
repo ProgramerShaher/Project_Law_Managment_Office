@@ -1,0 +1,58 @@
+<div class="page-container">
+  <!-- Header -->
+  <div nz-row nzJustify="space-between" nzAlign="middle" class="page-header">
+    <div nz-col nzMd="12">
+      <h1 class="page-title">
+        <span nz-icon nzType="audit" nzTheme="outline"></span>
+        إدارة المحامين
+      </h1>
+      <p class="page-description">إدارة جميع محامين المكتب والمعلومات الخاصة بهم</p>
+    </div>
+    <div nz-col nzMd="12" class="text-left">
+      <button nz-button nzType="primary" nzSize="large" (click)="openAddModal()">
+        <span nz-icon nzType="plus"></span>
+        إضافة محامي جديد
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <app-lawyer-stats [stats]="stats"></app-lawyer-stats>
+
+  <!-- Search and Filters -->
+  <app-lawyer-search
+    (searchChange)="onSearchChange($event)"
+    (filterChange)="onFilterChange($event)"
+    (filterApply)="onFilterApply()">
+  </app-lawyer-search>
+
+  <!-- Lawyers Table -->
+  <app-lawyer-table
+    [lawyers]="lawyers"
+    [filteredLawyers]="filteredLawyers"
+    [loading]="loading"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [totalItems]="totalItems"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (edit)="openEditModal($event)"
+    (delete)="onDeleteLawyer($event)">
+  </app-lawyer-table>
+</div>
+
+<!-- Add Lawyer Modal -->
+<app-lawyer-form
+  [isVisible]="isAddModalVisible"
+  [lawyer]="null"
+  (visibleChange)="isAddModalVisible = $event"
+  (lawyerSaved)="onLawyerAdded($event)">
+</app-lawyer-form>
+
+<!-- Edit Lawyer Modal -->
+<app-lawyer-form
+  [isVisible]="isEditModalVisible"
+  [lawyer]="selectedLawyer"
+  (visibleChange)="isEditModalVisible = $event"
+  (lawyerSaved)="onLawyerUpdated($event)">
+</app-lawyer-form>

@@ -1,0 +1,125 @@
+@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+/* You can add global styles to this file, and also import other style files */
+
+/* RTL Support and Arabic Font */
+/* Prefer system UI first to avoid falling back to CJK fonts when Google font fails to load */
+* {
+  font-family: 'Segoe UI', 'Cairo', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Small set of utility classes used by templates (bootstrap-like) */
+.d-flex { display: flex !important; }
+.justify-content-between { justify-content: space-between !important; }
+.align-items-center { align-items: center !important; }
+.me-2 { margin-inline-end: .5rem !important; }
+.me-3 { margin-inline-end: 1rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+.mt-4 { margin-top: 1.5rem !important; }
+.text-muted { color: var(--text-secondary) !important; }
+.text-center { text-align: center !important; }
+.text-lg-end { text-align: right !important; }
+.w-100 { width: 100% !important; }
+
+
+html {
+  direction: rtl;
+}
+
+body {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Custom Color Palette */
+:root {
+  --primary-color: #2563eb;
+  --primary-light: #3b82f6;
+  --primary-dark: #1d4ed8;
+  --secondary-color: #64748b;
+  --accent-color: #f59e0b;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #06b6d4;
+
+  --background-primary: #f8fafc;
+  --background-secondary: #ffffff;
+  --background-dark: #1e293b;
+
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-light: #94a3b8;
+
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Ant Design RTL Overrides */
+.ant-layout-sider {
+  direction: rtl;
+}
+
+.ant-menu {
+  direction: rtl;
+}
+
+.ant-menu-item {
+  text-align: right;
+}
+
+.ant-menu-submenu-title {
+  text-align: right;
+}
+
+.ant-layout-header {
+  direction: rtl;
+}
+
+.ant-card {
+  direction: rtl;
+}
+
+.ant-table {
+  direction: rtl;
+}
+
+.ant-table-thead > tr > th {
+  text-align: right;
+}
+
+.ant-table-tbody > tr > td {
+  text-align: right;
+}
+
+.ant-form-item-label {
+  text-align: right;
+}
+
+.ant-input {
+  text-align: right;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

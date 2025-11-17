@@ -1,0 +1,63 @@
+.page-container {
+  padding: 24px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  direction: rtl;
+}
+
+.page-header {
+  margin-bottom: 24px;
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #262626;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    span[nz-icon] {
+      color: #1890ff;
+      font-size: 24px;
+    }
+  }
+
+  .page-description {
+    color: #8c8c8c;
+    font-size: 16px;
+    margin-bottom: 0;
+  }
+
+  .text-left {
+    text-align: left;
+
+    button {
+      border-radius: 8px;
+      height: 48px;
+      font-weight: 600;
+
+      span[nz-icon] {
+        margin-left: 8px;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .page-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    .page-title {
+      font-size: 24px;
+    }
+
+    .text-left {
+      text-align: right;
+      margin-top: 16px;
+    }
+  }
+}

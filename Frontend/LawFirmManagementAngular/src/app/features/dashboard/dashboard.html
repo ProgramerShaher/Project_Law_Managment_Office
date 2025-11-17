@@ -1,0 +1,114 @@
+<div class="dashboard-container">
+  <!-- صفحة الرأس -->
+  <div class="page-header">
+    <h1 nz-typography>لوحة التحكم</h1>
+    <p nz-typography nzType="secondary">نظرة عامة على نشاطك القانوني</p>
+  </div>
+
+  <!-- إحصائيات سريعة -->
+  <div nz-row nzGutter="16" class="stats-row">
+    <div nz-col nzXs="24" nzSm="12" nzLg="6" *ngFor="let stat of stats">
+      <nz-card class="stat-card" [class]="'stat-card-' + stat.title.replace(' ', '-')">
+        <div class="stat-content">
+          <div class="stat-icon" [style.background]="stat.color">
+            <i nz-icon [nzType]="stat.icon" [style.color]="'white'"></i>
+          </div>
+          <div class="stat-info">
+            <h3 class="stat-value">{{stat.value}}</h3>
+            <p class="stat-title">{{stat.title}}</p>
+            <span class="stat-change" [style.color]="stat.change.includes('+') ? '#52c41a' : '#f5222d'">
+              <i nz-icon [nzType]="stat.change.includes('+') ? 'arrow-up' : 'arrow-down'"></i>
+              {{stat.change}}
+            </span>
+          </div>
+        </div>
+      </nz-card>
+    </div>
+  </div>
+
+  <!-- المحتوى الرئيسي -->
+  <div nz-row nzGutter="16" class="content-row">
+    <!-- القضايا الحديثة -->
+    <div nz-col nzXs="24" nzLg="12">
+      <nz-card nzTitle="القضايا الحديثة" [nzExtra]="viewAllCases">
+        <nz-table #casesTable [nzData]="recentCases" [nzFrontPagination]="false" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th>العميل</th>
+              <th>نوع القضية</th>
+              <th>الحالة</th>
+              <th>التاريخ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let case of casesTable.data">
+              <td>
+                <div class="client-info">
+                  <nz-avatar nzSize="small" nzIcon="user"></nz-avatar>
+                  <span>{{case.client}}</span>
+                </div>
+              </td>
+              <td>{{case.type}}</td>
+              <td>
+                <nz-tag [nzColor]="getStatusColor(case.status)">{{case.status}}</nz-tag>
+              </td>
+              <td>{{case.date}}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </div>
+
+    <!-- الجلسات القادمة -->
+    <div nz-col nzXs="24" nzLg="12">
+      <nz-card nzTitle="الجلسات القادمة" [nzExtra]="viewAllSessions">
+        <nz-list [nzDataSource]="upcomingSessions" nzSize="large" nzItemLayout="horizontal">
+          <nz-list-item *ngFor="let session of upcomingSessions" class="session-item">
+            <nz-list-item-meta>
+              <nz-list-item-meta-title>
+                {{session.case}}
+              </nz-list-item-meta-title>
+              <nz-list-item-meta-description>
+                <i nz-icon nzType="environment"></i>
+                {{session.court}}
+              </nz-list-item-meta-description>
+            </nz-list-item-meta>
+            <div class="session-time">
+              <div class="date">{{session.date}}</div>
+              <div class="time">{{session.time}}</div>
+            </div>
+          </nz-list-item>
+        </nz-list>
+      </nz-card>
+    </div>
+  </div>
+
+  <!-- مخطط سريع -->
+  <div nz-row nzGutter="16" class="chart-row">
+    <div nz-col nzXs="24" nzLg="12">
+      <nz-card nzTitle="نشاط القضايا الشهري">
+        <div class="chart-placeholder">
+          <i nz-icon nzType="bar-chart" class="chart-icon"></i>
+          <p>مخطط النشاط الشهري</p>
+        </div>
+      </nz-card>
+    </div>
+    <div nz-col nzXs="24" nzLg="12">
+      <nz-card nzTitle="توزيع أنواع القضايا">
+        <div class="chart-placeholder">
+          <i nz-icon nzType="pie-chart" class="chart-icon"></i>
+          <p>مخطط توزيع القضايا</p>
+        </div>
+      </nz-card>
+    </div>
+  </div>
+</div>
+
+<!-- أزرار إضافية -->
+<ng-template #viewAllCases>
+  <a routerLink="/cases">عرض الكل</a>
+</ng-template>
+
+<ng-template #viewAllSessions>
+  <a routerLink="/sessions">عرض الكل</a>
+</ng-template>

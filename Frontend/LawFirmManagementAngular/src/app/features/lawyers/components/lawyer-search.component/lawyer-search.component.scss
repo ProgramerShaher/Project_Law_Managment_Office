@@ -1,0 +1,89 @@
+.search-card {
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+
+  .ant-card-body {
+    padding: 20px;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-left {
+  text-align: left;
+}
+
+// تنسيق حقول الإدخال
+.ant-input-group {
+  .ant-input {
+    border-radius: 8px;
+    border: 1px solid #d9d9d9;
+    height: 40px;
+    text-align: right;
+
+    &:focus {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+  }
+
+  .ant-input-prefix {
+    margin-right: 8px;
+    color: #8c8c8c;
+  }
+}
+
+// تنسيق الـ Select
+.ant-select {
+  .ant-select-selector {
+    border-radius: 8px;
+    border: 1px solid #d9d9d9;
+    height: 40px;
+    text-align: right;
+
+    .ant-select-selection-item {
+      text-align: right;
+    }
+
+    &:hover {
+      border-color: #1890ff;
+    }
+  }
+}
+
+// تنسيق الأزرار
+button {
+  border-radius: 8px;
+  height: 40px;
+  font-weight: 500;
+
+  span[nz-icon] {
+    margin-left: 8px;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .search-card {
+    .ant-card-body {
+      padding: 16px;
+    }
+  }
+
+  .text-left {
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  .ant-row {
+    gap: 12px;
+  }
+}

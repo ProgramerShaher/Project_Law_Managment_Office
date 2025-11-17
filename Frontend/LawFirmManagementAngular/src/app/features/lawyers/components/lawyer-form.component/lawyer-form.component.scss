@@ -1,0 +1,76 @@
+// lawyer-form.component.scss
+.arabic-modal {
+  direction: rtl;
+
+  .ant-modal-header {
+    direction: rtl;
+
+    .ant-modal-title {
+      text-align: right;
+      font-weight: 600;
+    }
+  }
+
+  .ant-modal-body {
+    direction: rtl;
+  }
+}
+
+.arabic-form {
+  direction: rtl;
+
+  .ant-form-item-label {
+    text-align: right;
+    font-weight: 500;
+  }
+
+  .ant-input, .ant-picker, .ant-select-selector {
+    text-align: right;
+  }
+}
+
+.form-actions {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+
+  .action-btn {
+    margin-left: 8px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.error-message {
+  margin-top: 4px;
+}
+
+.required-field::before {
+  content: '*';
+  color: #ff4d4f;
+  margin-right: 4px;
+}
+
+// تخصيص لـ NG-ZORRO للمكونات العربية
+.ant-select-dropdown {
+  direction: rtl;
+
+  .ant-select-item {
+    text-align: right;
+  }
+}
+
+.ant-picker-panel {
+  direction: rtl;
+
+  .ant-picker-header,
+  .ant-picker-content th {
+    text-align: center;
+  }
+}

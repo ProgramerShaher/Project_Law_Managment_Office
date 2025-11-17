@@ -1,0 +1,396 @@
+.layout {
+  height: 100vh;
+  direction: rtl;
+}
+
+.sidebar {
+  background: #001529;
+
+  .logo {
+    height: 64px;
+    padding: 16px;
+    border-bottom: 1px solid #031529;
+
+    .logo-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: white;
+      transition: all 0.3s;
+
+      &.collapsed {
+        justify-content: center;
+      }
+
+      .logo-icon {
+        font-size: 24px;
+        color: #1890ff;
+      }
+
+      .logo-text {
+        font-size: 18px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.site-layout {
+  .header {
+    background: #fff;
+    padding: 0;
+    box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+    border-bottom: 1px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      padding: 0 24px;
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .collapse-btn {
+          font-size: 18px;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.025);
+          }
+        }
+
+        .breadcrumb {
+          margin-bottom: 0;
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        .search-box {
+          width: 280px;
+
+          .ant-input {
+            border-radius: 20px;
+          }
+        }
+
+        .notification-btn {
+          position: relative;
+          padding: 8px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s;
+          display: flex;
+          align-items: center;
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.025);
+          }
+
+          i {
+            font-size: 18px;
+            color: #595959;
+          }
+        }
+
+        .profile-dropdown {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          padding: 6px 12px;
+          border-radius: 8px;
+          transition: all 0.3s;
+          border: 1px solid transparent;
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.025);
+            border-color: #f0f0f0;
+          }
+
+          .profile-avatar {
+            background: #1890ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .profile-info {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+
+            .profile-name {
+              font-weight: 600;
+              font-size: 14px;
+              color: #262626;
+              line-height: 1.2;
+            }
+
+            .profile-role {
+              font-size: 12px;
+              color: #8c8c8c;
+              line-height: 1.2;
+            }
+          }
+
+          .profile-arrow {
+            font-size: 12px;
+            color: #8c8c8c;
+            transition: transform 0.3s;
+          }
+        }
+      }
+    }
+  }
+
+  .content {
+    margin: 24px;
+    overflow: auto;
+    min-height: calc(100vh - 64px - 70px);
+    background: #f5f5f5;
+    border-radius: 8px;
+  }
+
+  .footer {
+    background: #fafafa;
+    border-top: 1px solid #f0f0f0;
+    padding: 16px 24px;
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .footer-links {
+        display: flex;
+        gap: 24px;
+
+        a {
+          color: #8c8c8c;
+          text-decoration: none;
+          font-size: 14px;
+
+          &:hover {
+            color: #1890ff;
+          }
+        }
+      }
+    }
+  }
+}
+
+// تصميم الإشعارات
+.notification-menu {
+  width: 360px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+    border-radius: 8px 8px 0 0;
+
+    h4 {
+      margin: 0;
+      font-weight: 600;
+      color: #262626;
+    }
+
+    button {
+      font-size: 12px;
+      color: #1890ff;
+    }
+  }
+
+  .ant-menu-item {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    &.unread {
+      background: #f6ffed;
+    }
+
+    .notification-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f5f5f5;
+      position: relative;
+
+      .notification-content {
+        flex: 1;
+
+        .notification-title {
+          font-weight: 500;
+          margin-bottom: 4px;
+          color: #262626;
+        }
+
+        .notification-desc {
+          color: #8c8c8c;
+          font-size: 12px;
+          margin-bottom: 4px;
+          line-height: 1.4;
+        }
+
+        .notification-time {
+          color: #bfbfbf;
+          font-size: 11px;
+        }
+      }
+
+      .notification-dot {
+        width: 8px;
+        height: 8px;
+        background: #1890ff;
+        border-radius: 50%;
+        margin-top: 8px;
+        flex-shrink: 0;
+      }
+    }
+
+    &:last-child .notification-item {
+      border-bottom: none;
+    }
+  }
+
+  .view-all {
+    text-align: center;
+    padding: 8px;
+    border-top: 1px solid #f0f0f0;
+
+    button {
+      color: #1890ff;
+    }
+  }
+}
+
+// تصميم قائمة الملف الشخصي
+.profile-menu {
+  width: 200px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+  .ant-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px !important;
+    margin: 0 !important;
+    border-radius: 0;
+
+    i {
+      font-size: 14px;
+      color: #595959;
+    }
+
+    span {
+      font-size: 14px;
+      color: #262626;
+    }
+
+    &:hover {
+      background: #f5f5f5;
+    }
+
+    &:first-child {
+      border-radius: 8px 8px 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 0 8px 8px;
+    }
+  }
+
+  .ant-menu-divider {
+    margin: 4px 0;
+  }
+}
+
+// تصميم متجاوب
+@media (max-width: 768px) {
+  .site-layout {
+    .header .header-content {
+      padding: 0 16px;
+
+      .header-actions {
+        gap: 12px;
+
+        .search-box {
+          width: 180px;
+        }
+
+        .profile-dropdown .profile-info {
+          display: none;
+        }
+      }
+    }
+
+    .content {
+      margin: 16px;
+    }
+
+    .footer .footer-content {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+  }
+
+  .notification-menu {
+    width: 300px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-actions .search-box {
+    display: none;
+  }
+}
+
+// تأثيرات إضافية
+::ng-deep {
+  .ant-dropdown {
+    border-radius: 8px;
+
+    .ant-dropdown-menu {
+      border-radius: 8px;
+      padding: 0;
+    }
+  }
+
+  .ant-badge {
+    .ant-badge-count {
+      box-shadow: none;
+      font-size: 10px;
+      min-width: 16px;
+      height: 16px;
+      line-height: 16px;
+    }
+  }
+}

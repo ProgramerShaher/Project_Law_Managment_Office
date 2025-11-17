@@ -1,0 +1,378 @@
+<div class="page-container" dir="rtl">
+  <!-- Header -->
+  <div nz-row nzJustify="space-between" nzAlign="middle" class="page-header">
+    <div nz-col nzMd="12">
+      <h1 class="page-title">
+        <span nz-icon nzType="file-sync" nzTheme="outline"></span>
+        إدارة الوكالات المشتقة
+      </h1>
+      <p class="page-description">إدارة جميع الوكالات المشتقة من الوكالات الأصلية</p>
+    </div>
+    <div nz-col nzMd="12" class="text-left">
+      <button nz-button nzType="primary" nzSize="large" (click)="openAddModal()">
+        <span nz-icon nzType="plus"></span>
+        إضافة وكالة مشتقة
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div nz-row nzGutter="16" class="stats-section">
+    <div nz-col nzXs="24" nzSm="12" nzMd="6" *ngFor="let stat of stats | keyvalue">
+      <nz-card class="stat-card">
+        <nz-statistic
+          [nzValue]="stat.value"
+          [nzTitle]="getStatLabel(stat.key)"
+          [nzPrefix]="statPrefix"
+          [nzValueStyle]="{ color: '#3f8600' }">
+          <ng-template #statPrefix>
+            <span nz-icon [nzType]="getStatIcon(stat.key)" nzTheme="outline"></span>
+          </ng-template>
+        </nz-statistic>
+      </nz-card>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <nz-card class="search-card">
+    <div nz-row nzGutter="16" nzAlign="middle">
+      <div nz-col nzXs="24" nzSm="12" nzMd="8">
+        <nz-input-group nzPrefixIcon="search">
+          <input
+            nz-input
+            placeholder="البحث برقم الوكالة أو اسم المحامي..."
+            [(ngModel)]="searchTerm"
+            (input)="filterDerivedAgencies()"
+          />
+        </nz-input-group>
+      </div>
+      <div nz-col nzXs="24" nzSm="12" nzMd="8">
+        <nz-select
+          nzPlaceHolder="اختر الحالة"
+          [(ngModel)]="selectedStatus"
+          (ngModelChange)="filterDerivedAgencies()"
+          class="full-width">
+          <nz-option nzValue="" nzLabel="جميع الحالات"></nz-option>
+          <nz-option nzValue="active" nzLabel="نشطة"></nz-option>
+          <nz-option nzValue="expired" nzLabel="منتهية"></nz-option>
+          <nz-option nzValue="inactive" nzLabel="موقفة"></nz-option>
+        </nz-select>
+      </div>
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" class="text-left">
+        <button nz-button nzType="default" nzSize="large" class="full-width" (click)="filterDerivedAgencies()">
+          <span nz-icon nzType="filter"></span>
+          تطبيق التصفية
+        </button>
+      </div>
+    </div>
+  </nz-card>
+
+  <!-- Derived Agencies Table -->
+  <!-- ... باقي الكود يبقى كما هو حتى الجدول ... -->
+
+<!-- Derived Agencies Table -->
+<nz-card class="table-card">
+
+  <div class="table-container">
+    <nz-table
+      #derivedAgenciesTable
+      nzShowSizeChanger
+      [nzData]="paginatedDerivedAgencies"
+      [nzLoading]="loading"
+      [nzTotal]="totalItems"
+      [nzPageSize]="pageSize"
+      [nzPageIndex]="pageIndex"
+      (nzPageIndexChange)="onPageChange($event)"
+      (nzPageSizeChange)="onPageSizeChange($event)"
+      nzTableLayout="fixed"
+      class="custom-table">
+      <thead>
+        <tr>
+          <th nzWidth="80px">#</th>
+          <th nzWidth="120px">رقم الوكالة</th>
+          <th>الوكالة الأصلية</th>
+          <th>المحامي</th>
+          <th nzWidth="120px">تاريخ الإصدار</th>
+          <th nzWidth="120px">تاريخ الانتهاء</th>
+          <th nzWidth="100px">الحالة</th>
+          <th nzWidth="150px">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let agency of derivedAgenciesTable.data; let i = index">
+          <td>{{ (pageIndex - 1) * pageSize + i + 1 }}</td>
+          <td>
+            <strong>{{ agency.derivedNumber }}</strong>
+          </td>
+          <td>
+            <div class="parent-agency-info">
+              <nz-avatar
+                nzSize="small"
+                nzSrc="https://placehold.co/40x40"
+                class="agency-avatar">
+              </nz-avatar>
+              <div class="agency-details">
+                <strong>{{ getParentAgencyInfo(agency.parentPowerOfAttorneyId) }}</strong>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="lawyer-info">
+              <nz-avatar
+                nzSize="small"
+                nzSrc="https://placehold.co/40x40"
+                class="lawyer-avatar">
+              </nz-avatar>
+              <div class="lawyer-details">
+                <strong>{{ getLawyerName(agency.lawyerId) }}</strong>
+              </div>
+            </div>
+          </td>
+          <td>{{ formatDate(agency.issueDate) }}</td>
+          <td>
+            <span *ngIf="agency.expiryDate">{{ formatDate(agency.expiryDate) }}</span>
+            <span *ngIf="!agency.expiryDate" class="text-muted">---</span>
+          </td>
+          <td>
+            <nz-tag *ngIf="!agency.isActive" [nzColor]="'default'">
+              موقفة
+            </nz-tag>
+            <nz-tag *ngIf="agency.isActive && isExpired(agency.expiryDate)" [nzColor]="'red'">
+              منتهية
+            </nz-tag>
+            <nz-tag *ngIf="agency.isActive && !isExpired(agency.expiryDate)" [nzColor]="'green'">
+              نشطة
+            </nz-tag>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button
+                nz-button
+                nzType="default"
+                nzSize="small"
+                nz-tooltip
+                nzTitle="عرض التفاصيل"
+                class="action-btn view">
+                <span nz-icon nzType="eye" nzTheme="outline"></span>
+              </button>
+              <button
+                nz-button
+                nzType="default"
+                nzSize="small"
+                nz-tooltip
+                nzTitle="تعديل"
+                class="action-btn edit"
+                (click)="openEditModal(agency)">
+                <span nz-icon nzType="edit" nzTheme="outline"></span>
+              </button>
+              <button
+  nz-button
+  nzType="default"
+  nzSize="small"
+  class="action-btn status"
+  nz-tooltip
+  [nzTooltipTitle]="agency.isActive ? 'إيقاف' : 'تفعيل'"
+  (click)="toggleAgencyStatus(agency)">
+  <span nz-icon [nzType]="agency.isActive ? 'pause' : 'play-circle'" nzTheme="outline"></span>
+</button>
+              <button
+                nz-button
+                nzType="default"
+                nzSize="small"
+                nz-tooltip
+                nzTitle="حذف"
+                class="action-btn delete"
+                (click)="deleteDerivedAgency(agency)">
+                <span nz-icon nzType="delete" nzTheme="outline"></span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredDerivedAgencies.length === 0" class="empty-state">
+      <nz-empty nzNotFoundImage="simple">
+        <span nz-typography nzType="secondary">لا توجد نتائج للعرض</span>
+      </nz-empty>
+    </div>
+  </div>
+</nz-card>
+
+</div>
+
+<!-- Add Derived Agency Modal -->
+<nz-modal
+  [(nzVisible)]="isAddModalVisible"
+  nzTitle="إضافة وكالة مشتقة"
+  nzWidth="800px"
+  nzWrapClassName="arabic-modal"
+  (nzOnCancel)="isAddModalVisible = false"
+  (nzOnOk)="addDerivedAgency()">
+  <ng-container *nzModalContent>
+    <form nz-form class="arabic-form">
+      <div nz-row nzGutter="16">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>رقم الوكالة المشتقة</nz-form-label>
+            <nz-form-control>
+              <input
+                nz-input
+                [(ngModel)]="newDerivedAgency.derivedNumber"
+                name="derivedNumber"
+                placeholder="رقم الوكالة المشتقة"
+                required
+                readonly
+              />
+              <div class="form-extra">يتم توليد الرقم تلقائياً</div>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>تاريخ الإصدار</nz-form-label>
+            <nz-form-control>
+              <nz-date-picker
+                [(ngModel)]="newDerivedAgency.issueDate"
+                name="issueDate"
+                nzFormat="yyyy-MM-dd"
+                class="full-width arabic-date-picker"
+                required>
+              </nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label>تاريخ الانتهاء</nz-form-label>
+            <nz-form-control>
+              <nz-date-picker
+                [(ngModel)]="newDerivedAgency.expiryDate"
+                name="expiryDate"
+                nzFormat="yyyy-MM-dd"
+                class="full-width arabic-date-picker">
+              </nz-date-picker>
+              <div class="form-extra">اختياري - اتركه فارغاً للوكالات الدائمة</div>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label>الحالة</nz-form-label>
+            <nz-form-control>
+              <nz-switch
+                [(ngModel)]="newDerivedAgency.isActive"
+                name="isActive"
+                [nzCheckedChildren]="'نشطة'"
+                [nzUnCheckedChildren]="'موقفة'">
+              </nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>الوكالة الأصلية</nz-form-label>
+            <nz-form-control>
+              <nz-select
+                [(ngModel)]="newDerivedAgency.parentPowerOfAttorneyId"
+                name="parentPowerOfAttorneyId"
+                nzPlaceHolder="اختر الوكالة الأصلية"
+                class="full-width arabic-select"
+                required>
+                <nz-option
+                  *ngFor="let parent of parentAgencies"
+                  [nzValue]="parent.id"
+                  [nzLabel]="parent.agencyNumber + ' - ' + parent.clientName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>المحامي</nz-form-label>
+            <nz-form-control>
+              <nz-select
+                [(ngModel)]="newDerivedAgency.lawyerId"
+                name="lawyerId"
+                nzPlaceHolder="اختر المحامي"
+                class="full-width arabic-select"
+                required>
+                <nz-option
+                  *ngFor="let lawyer of lawyers"
+                  [nzValue]="lawyer.id"
+                  [nzLabel]="lawyer.fullName + ' - ' + lawyer.type">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-label>نطاق الصلاحية</nz-form-label>
+        <nz-form-control>
+          <textarea
+            nz-input
+            [(ngModel)]="newDerivedAgency.authorityScope"
+            name="authorityScope"
+            placeholder="حدد نطاق الصلاحية والاختصاصات..."
+            rows="3"
+            maxlength="300">
+          </textarea>
+          <div class="form-extra">حدد نطاق الصلاحية والاختصاصات الممنوحة للمحامي (اختياري)</div>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label>ملاحظات</nz-form-label>
+        <nz-form-control>
+          <textarea
+            nz-input
+            [(ngModel)]="newDerivedAgency.notes"
+            name="notes"
+            placeholder="أضف أي ملاحظات إضافية..."
+            rows="2"
+            maxlength="500">
+          </textarea>
+          <div class="form-extra">ملاحظات إضافية حول الوكالة المشتقة (اختياري)</div>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>صورة الوكالة المشتقة</nz-form-label>
+        <nz-form-control>
+          <nz-upload
+            nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            [nzBeforeUpload]="beforeUpload"
+            (nzChange)="handleUploadChange($event, false)"
+            [nzFileList]="[]">
+            <button nz-button>
+              <span nz-icon nzType="upload"></span>
+              رفع صورة الوكالة المشتقة
+            </button>
+          </nz-upload>
+          <div class="form-extra">الملفات المسموحة: PDF, JPG, PNG (أقصى حجم 10MB)</div>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+  <div *nzModalFooter>
+    <button nz-button nzType="default" (click)="isAddModalVisible = false">
+      إلغاء
+    </button>
+    <button nz-button nzType="primary" (click)="addDerivedAgency()">
+      حفظ الوكالة المشتقة
+    </button>
+  </div>
+</nz-modal>
+
+<!-- Edit Derived Agency Modal -->
+<!-- سيحتوي على نفس الحقول مع البيانات الحالية -->

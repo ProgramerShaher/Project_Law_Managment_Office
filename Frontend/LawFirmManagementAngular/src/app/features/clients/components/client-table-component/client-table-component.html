@@ -1,0 +1,117 @@
+    <!-- <nz-card>
+      <div nz-row nzJustify="space-between" nzAlign="middle" class="mb-4">
+        <div nz-col>
+          <h4 nz-typography class="mb-0">قائمة العملاء ({{clients.length}})</h4>
+        </div>
+        <div nz-col class="text-right">
+          <nz-space>
+            <span *nzSpaceItem nz-typography nzType="secondary">ترتيب حسب:</span>
+            <nz-select *nzSpaceItem [ngModel]="sortField" (ngModelChange)="onSortFieldChange.emit($event)" nzSize="small">
+              <nz-option nzValue="fullName" nzLabel="الاسم"></nz-option>
+              <nz-option nzValue="birthDate" nzLabel="تاريخ الميلاد"></nz-option>
+            </nz-select>
+            <button *nzSpaceItem nz-button nzSize="small" (click)="onToggleSort.emit()">
+              <i nz-icon [nzType]="sortOrder === 'ascend' ? 'sort-ascending' : 'sort-descending'"></i>
+            </button>
+          </nz-space>
+        </div>
+      </div>
+
+      <nz-table
+        #clientTable
+        nzShowSizeChanger
+        [nzData]="paginatedClients"
+        [nzLoading]="isLoading"
+        [nzFrontPagination]="false"
+        [nzTotal]="clients.length"
+        [nzPageIndex]="currentPage"
+        [nzPageSize]="pageSize"
+        (nzPageIndexChange)="onPageChange.emit($event)"
+        (nzPageSizeChange)="onPageSizeChange.emit($event)"
+        nzTableLayout="fixed">
+
+        <thead>
+          <tr>
+            <th nzWidth="60px">#</th>
+            <th nzWidth="200px">الاسم الكامل</th>
+            <th nzWidth="120px">تاريخ الميلاد</th>
+            <th nzWidth="120px">نوع العميل</th>
+            <th nzWidth="120px">دور العميل</th>
+            <th nzWidth="150px">البريد الإلكتروني</th>
+            <th nzWidth="130px">رقم الهاتف</th>
+            <th nzWidth="150px">الإجراءات</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let client of clientTable.data; let i = index"
+              [class.new-client]="isNewClient(client)">
+            <td>{{(currentPage - 1) * pageSize + i + 1}}</td>
+            <td>
+              <nz-space>
+                <div *nzSpaceItem class="client-avatar">
+                  <i nz-icon nzType="user"></i>
+                </div>
+                <div *nzSpaceItem>
+                  <div nz-typography><strong>{{client.fullName}}</strong></div>
+                  <small nz-typography nzType="secondary">ID: {{client.id}}</small>
+                </div>
+              </nz-space>
+            </td>
+            <td>{{formatDate(client.birthDate)}}</td>
+            <td>
+              <nz-tag [nzColor]="getClientTypeClass(client.clientType)">
+                {{getClientTypeLabel(client.clientType)}}
+              </nz-tag>
+            </td>
+            <td>
+              <nz-tag>{{getClientRoleName(client.clientRoleId)}}</nz-tag>
+            </td>
+            <td>
+              <nz-space>
+                <i *nzSpaceItem nz-icon nzType="mail" nzTheme="outline"></i>
+                <span *nzSpaceItem>{{client.email || '---'}}</span>
+              </nz-space>
+            </td>
+            <td>
+              <nz-space>
+                <i *nzSpaceItem nz-icon nzType="phone" nzTheme="outline"></i>
+                <span *nzSpaceItem>{{client.phoneNumber}}</span>
+              </nz-space>
+            </td>
+            <td>
+              <nz-space>
+                <button *nzSpaceItem nz-button nzType="link" nzSize="small"
+                        nz-tooltip="عرض التفاصيل"
+                        (click)="onViewDetails.emit(client)">
+                  <i nz-icon nzType="eye"></i>
+                </button>
+                <button *nzSpaceItem nz-button nzType="link" nzSize="small"
+                        nz-tooltip="تعديل"
+                        (click)="onEdit.emit(client)">
+                  <i nz-icon nzType="edit"></i>
+                </button>
+                <button *nzSpaceItem nz-button nzType="link" nzSize="small" nzDanger
+                        nz-tooltip="حذف"
+                        (click)="onDelete.emit(client)">
+                  <i nz-icon nzType="delete"></i>
+                </button>
+              </nz-space>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <nz-empty *ngIf="clients.length === 0 && !isLoading"
+                nzNotFoundImage="simple"
+                [nzNotFoundContent]="contentTpl">
+        <ng-template #contentTpl>
+          <span>لا توجد عملاء للعرض</span>
+          <br>
+          <button nz-button nzType="primary" (click)="onAddClient.emit()" class="mt-2">
+            <i nz-icon nzType="plus"></i>
+            إضافة عميل جديد
+          </button>
+        </ng-template>
+      </nz-empty>
+    </nz-card> -->

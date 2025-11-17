@@ -1,0 +1,34 @@
+
+    <!-- <nz-upload
+      class="upload-list-inline"
+      [nzAction]="actionUrl"
+      nzListType="picture"
+      [(nzFileList)]="fileList2"
+      [nzMultiple]="IsMultiple"
+      (nzChange)="handleUploadedUrls($event)"
+      (nzFileListChange)="fileList2 = $event"
+    >
+      <button nz-button>
+        <span>
+          <nz-icon nzType="upload" />
+          Upload
+        </span>
+      </button>
+    </nz-upload> -->
+    <nz-form-item>
+   <nz-form-label>{{lable}}</nz-form-label>
+ <nz-form-control>
+     <nz-upload
+                  [nzAction]="actionUrl"
+                  nzListType="picture-card"
+                  [(nzFileList)]="fileList2"
+                  [nzShowButton]="fileList2.length < 1"
+                   (nzChange)="handleUploadedUrls($event)"
+                  (nzFileListChange)="fileList2 = $event"
+                   [nzMultiple]="IsMultiple">
+                  <div>
+                  <i nz-icon nzType="plus"></i>
+                  </div>
+</nz-upload>
+</nz-form-control>
+</nz-form-item>

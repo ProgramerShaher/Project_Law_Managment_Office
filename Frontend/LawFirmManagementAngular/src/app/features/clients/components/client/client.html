@@ -1,0 +1,541 @@
+<div class="main-content">
+  <!-- Header -->
+  <div nz-row nzJustify="space-between" nzAlign="middle" class="mb-6">
+    <div nz-col nzMd="12">
+      <h2 nz-typography>
+        <i nz-icon nzType="team" class="me-2"></i>
+        إدارة العملاء
+      </h2>
+      <p nz-typography nzType="secondary">إدارة جميع عملاء المكتب والمعلومات الخاصة بهم</p>
+    </div>
+    <div nz-col nzMd="12" class="text-right">
+      <button nz-button nzType="primary" nzSize="large" (click)="openAddModal()">
+        <i nz-icon nzType="plus"></i>
+        إضافة عميل جديد
+      </button>
+      <button nz-button nzSize="large" class="ms-2" (click)="exportToExcel()">
+        <i nz-icon nzType="file-excel"></i>
+        تصدير Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <nz-spin [nzSpinning]="isLoading" nzSize="large">
+    <!-- Stats Cards -->
+    <div nz-row nzGutter="16" class="mb-6" *ngIf="!isLoading">
+      <div nz-col nzXs="24" nzSm="12" nzMd="6" *ngFor="let stat of stats | keyvalue">
+        <nz-card>
+          <div nz-row nzAlign="middle">
+            <div nz-col nzSpan="16">
+              <p nz-typography nzType="secondary">{{getStatLabel(stat.key)}}</p>
+              <h3 nz-typography class="mb-0">{{stat.value}}</h3>
+            </div>
+            <div nz-col nzSpan="8" class="text-right">
+              <div [class]="'stat-icon-' + getStatIconClass(stat.key)">
+                <i nz-icon [nzType]="getStatIcon(stat.key)" class="stat-icon"></i>
+              </div>
+            </div>
+          </div>
+        </nz-card>
+      </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <nz-card class="mb-6" *ngIf="!isLoading">
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzSm="12" nzMd="6">
+          <nz-input-group nzPrefixIcon="search">
+            <input nz-input placeholder="البحث بالاسم، البريد، الهاتف..."
+                   [(ngModel)]="searchTerm" (input)="filterClients()" />
+          </nz-input-group>
+        </div>
+        <div nz-col nzXs="24" nzSm="12" nzMd="6">
+          <nz-select nzPlaceHolder="جميع الأنواع" [(ngModel)]="selectedType" (ngModelChange)="filterClients()">
+            <nz-option nzValue="" nzLabel="جميع الأنواع"></nz-option>
+            <nz-option nzValue="فردي" nzLabel="فردي"></nz-option>
+            <nz-option nzValue="شركة" nzLabel="شركة"></nz-option>
+            <nz-option nzValue="شخص" nzLabel="شخص"></nz-option>
+          </nz-select>
+        </div>
+        <div nz-col nzXs="24" nzSm="12" nzMd="6">
+          <nz-select nzPlaceHolder="جميع الأدوار" [(ngModel)]="selectedRole" (ngModelChange)="filterClients()">
+            <nz-option nzValue="" nzLabel="جميع الأدوار"></nz-option>
+            <nz-option *ngFor="let role of clientRoles" [nzValue]="role.name" [nzLabel]="role.name"></nz-option>
+          </nz-select>
+        </div>
+        <div nz-col nzXs="24" nzSm="12" nzMd="6">
+          <button nz-button nzBlock (click)="clearFilters()">
+            <i nz-icon nzType="clear"></i>
+            مسح الفلتر
+          </button>
+        </div>
+      </div>
+    </nz-card>
+
+    <!-- Clients Table -->
+    <nz-card *ngIf="!isLoading">
+      <div nz-row nzJustify="space-between" nzAlign="middle" class="mb-4">
+        <div nz-col>
+          <h4 nz-typography class="mb-0">قائمة العملاء ({{filteredClients.length}})</h4>
+        </div>
+        <div nz-col class="text-right">
+          <nz-space>
+            <span *nzSpaceItem nz-typography nzType="secondary">ترتيب حسب:</span>
+            <nz-select *nzSpaceItem [ngModel]="sortField" (ngModelChange)="sortField = $event; sortClients()" nzSize="small">
+              <nz-option nzValue="fullName" nzLabel="الاسم"></nz-option>
+              <nz-option nzValue="birthDate" nzLabel="تاريخ الميلاد"></nz-option>
+            </nz-select>
+            <button *nzSpaceItem nz-button nzSize="small" (click)="toggleSortOrder()">
+              <i nz-icon [nzType]="sortOrder === 'ascend' ? 'sort-ascending' : 'sort-descending'"></i>
+            </button>
+          </nz-space>
+        </div>
+      </div>
+
+      <nz-table
+        #clientTable
+        nzShowSizeChanger
+        [nzData]="paginatedClients"
+        [nzLoading]="isLoading"
+        [nzFrontPagination]="false"
+        [nzTotal]="filteredClients.length"
+        [nzPageIndex]="currentPage"
+        [nzPageSize]="pageSize"
+        (nzPageIndexChange)="onPageChange($event)"
+        (nzPageSizeChange)="onPageSizeChange($event)"
+        nzTableLayout="fixed">
+
+        <thead>
+          <tr>
+            <th nzWidth="60px">#</th>
+            <th nzWidth="200px">الاسم الكامل</th>
+            <th nzWidth="120px">تاريخ الميلاد</th>
+            <th nzWidth="120px">نوع العميل</th>
+            <th nzWidth="120px">دور العميل</th>
+            <th nzWidth="150px">البريد الإلكتروني</th>
+            <th nzWidth="130px">رقم الهاتف</th>
+            <th nzWidth="150px">الإجراءات</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let client of clientTable.data; let i = index"
+              [class.new-client]="isNewClient(client)">
+            <td>{{(currentPage - 1) * pageSize + i + 1}}</td>
+            <td>
+              <nz-space>
+                <div *nzSpaceItem class="client-avatar">
+                  <i nz-icon nzType="user"></i>
+                </div>
+                <div *nzSpaceItem>
+                  <div nz-typography><strong>{{client.fullName}}</strong></div>
+                  <small nz-typography nzType="secondary">ID: {{client.id}}</small>
+                </div>
+              </nz-space>
+            </td>
+            <td>{{formatDate(client.birthDate)}}</td>
+            <td>
+              <nz-tag [nzColor]="getClientTypeClass(client.clientType)">
+                {{getClientTypeLabel(client.clientType)}}
+              </nz-tag>
+            </td>
+            <td>
+              <nz-tag>{{getClientRoleName(client.clientRoleId)}}</nz-tag>
+            </td>
+            <td>
+              <nz-space>
+                <i *nzSpaceItem nz-icon nzType="mail" nzTheme="outline"></i>
+                <span *nzSpaceItem>{{client.email || '---'}}</span>
+              </nz-space>
+            </td>
+            <td>
+              <nz-space>
+                <i *nzSpaceItem nz-icon nzType="phone" nzTheme="outline"></i>
+                <span *nzSpaceItem>{{client.phoneNumber}}</span>
+              </nz-space>
+            </td>
+            <td>
+              <nz-space>
+                <button *nzSpaceItem nz-button nzType="link" nzSize="small"
+                        nz-tooltip="عرض التفاصيل"
+                        (click)="viewClientDetails(client)">
+                  <i nz-icon nzType="eye"></i>
+                </button>
+                <button *nzSpaceItem nz-button nzType="link" nzSize="small"
+                        nz-tooltip="تعديل"
+                        (click)="openEditModal(client)">
+                  <i nz-icon nzType="edit"></i>
+                </button>
+                <button *nzSpaceItem nz-button nzType="link" nzSize="small" nzDanger
+                        nz-tooltip="حذف"
+                        (click)="confirmDelete(client)">
+                  <i nz-icon nzType="delete"></i>
+                </button>
+              </nz-space>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <!-- Empty State -->
+      <nz-empty *ngIf="filteredClients.length === 0 && !isLoading"
+                nzNotFoundImage="simple"
+                [nzNotFoundContent]="contentTpl">
+        <ng-template #contentTpl>
+          <span>لا توجد عملاء للعرض</span>
+          <br>
+          <button nz-button nzType="primary" (click)="openAddModal()" class="mt-2">
+            <i nz-icon nzType="plus"></i>
+            إضافة عميل جديد
+          </button>
+        </ng-template>
+      </nz-empty>
+    </nz-card>
+  </nz-spin>
+</div>
+
+<!-- Add Client Modal -->
+<nz-modal [(nzVisible)]="isAddModalVisible" nzTitle="إضافة عميل جديد"
+          nzWidth="800px" (nzOnCancel)="closeAddModal()"
+          [nzFooter]="addModalFooter">
+
+  <ng-container *nzModalContent>
+    <form nz-form>
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>الاسم الكامل</nz-form-label>
+            <nz-form-control>
+              <input nz-input [(ngModel)]="newClient.fullName" name="fullName"
+                     placeholder="أدخل الاسم الكامل" required />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>تاريخ الميلاد</nz-form-label>
+            <nz-form-control>
+             <nz-date-picker  [(ngModel)]="newClient.birthDate" name="editBirthDate"
+                ></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>نوع العميل</nz-form-label>
+            <nz-form-control>
+              <nz-select [(ngModel)]="newClient.clientType" name="clientType" nzPlaceHolder="اختر نوع العميل" required>
+                <nz-option nzValue="1" nzLabel="فردي"></nz-option>
+                <nz-option nzValue="2" nzLabel="شركة"></nz-option>
+                <nz-option nzValue="3" nzLabel="شخص"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>دور العميل</nz-form-label>
+            <nz-form-control>
+              <nz-select [(ngModel)]="newClient.clientRoleId" name="clientRoleId" nzPlaceHolder="اختر دور العميل" required>
+                <nz-option *ngFor="let role of clientRoles"
+                          [nzValue]="role.id" [nzLabel]="role.name"></nz-option>
+              </nz-select>
+              <button nz-button nzType="link" nzSize="small" (click)="openAddRoleModal()" class="mt-1">
+                <i nz-icon nzType="plus"></i>
+                إضافة دور جديد
+              </button>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label>البريد الإلكتروني</nz-form-label>
+            <nz-form-control>
+              <input nz-input type="email" [(ngModel)]="newClient.email"
+                     name="email" placeholder="أدخل البريد الإلكتروني" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>رقم الهاتف</nz-form-label>
+            <nz-form-control>
+              <input nz-input type="tel" [(ngModel)]="newClient.phoneNumber"
+                     name="phoneNumber" placeholder="أدخل رقم الهاتف" required />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-label>العنوان</nz-form-label>
+        <nz-form-control>
+          <textarea nz-input [(ngModel)]="newClient.address" name="address"
+                    rows="3" placeholder="أدخل العنوان الكامل"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- استخدام كومبوننت رفع الملفات المخصص -->
+      <nz-form-item>
+        <nz-form-label nzRequired>صورة الهوية الوطنية</nz-form-label>
+        <nz-form-control>
+          <upload-Document
+            [lable]="'صورة الهوية'"
+            [IsMultiple]="false"
+            [FileUrl]="urlImageNationalId"
+            [uploadFolder]="'Clients'"
+            (fileChanged)="onIdentityImageChanged($event)">
+          </upload-Document>
+
+          <!-- عرض الصورة المرفوعة للتأكد -->
+          <div *ngIf="urlImageNationalId" class="mt-2">
+            <img [src]="urlImageNationalId" alt="صورة الهوية المرفوعة"
+                 style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; padding: 5px;" />
+            <div class="text-center mt-1">
+              <small nz-typography nzType="success">✓ تم رفع الصورة بنجاح</small>
+            </div>
+          </div>
+
+          <div class="error-message" *ngIf="showValidationErrors && !urlImageNationalId">
+            <span style="color: #ff4d4f; font-size: 12px;">صورة الهوية الوطنية مطلوبة</span>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+
+  <ng-template #addModalFooter>
+    <button nz-button (click)="closeAddModal()">إلغاء</button>
+    <button nz-button nzType="primary"
+            [nzLoading]="isSubmitting"
+            (click)="addClient()">
+      حفظ العميل
+    </button>
+  </ng-template>
+</nz-modal>
+
+<!-- Edit Client Modal -->
+<nz-modal [(nzVisible)]="isEditModalVisible" nzTitle="تعديل بيانات العميل"
+          nzWidth="800px" (nzOnCancel)="closeEditModal()"
+          [nzFooter]="editModalFooter">
+
+  <ng-container *nzModalContent>
+    <form nz-form *ngIf="editedClient">
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>الاسم الكامل</nz-form-label>
+            <nz-form-control>
+              <input nz-input [(ngModel)]="editedClient.fullName" name="editFullName"
+                     placeholder="أدخل الاسم الكامل" required />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>تاريخ الميلاد</nz-form-label>
+            <nz-form-control>
+                 <nz-date-picker [(ngModel)]="editedClient.birthDate" name="editBirthDate"
+                ></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>نوع العميل</nz-form-label>
+            <nz-form-control>
+              <nz-select [(ngModel)]="editedClient.clientType" name="editClientType" required>
+                <nz-option nzValue="1" nzLabel="فردي"></nz-option>
+                <nz-option nzValue="2" nzLabel="شركة"></nz-option>
+                <nz-option nzValue="3" nzLabel="شخص"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>دور العميل</nz-form-label>
+            <nz-form-control>
+              <nz-select [(ngModel)]="editedClient.clientRoleId" name="editClientRoleId" required>
+                <nz-option *ngFor="let role of clientRoles"
+                          [nzValue]="role.id" [nzLabel]="role.name"></nz-option>
+              </nz-select>
+              <button nz-button nzType="link" nzSize="small" (click)="openAddRoleModal()" class="mt-1">
+                <i nz-icon nzType="plus"></i>
+                إضافة دور جديد
+              </button>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label>البريد الإلكتروني</nz-form-label>
+            <nz-form-control>
+              <input nz-input type="email" [(ngModel)]="editedClient.email"
+                     name="editEmail" placeholder="أدخل البريد الإلكتروني" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzMd="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>رقم الهاتف</nz-form-label>
+            <nz-form-control>
+              <input nz-input type="tel" [(ngModel)]="editedClient.phoneNumber"
+                     name="editPhoneNumber" placeholder="أدخل رقم الهاتف" required />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-label>العنوان</nz-form-label>
+        <nz-form-control>
+          <textarea nz-input [(ngModel)]="editedClient.address" name="editAddress"
+                    rows="3" placeholder="أدخل العنوان الكامل"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- استخدام كومبوننت رفع الملفات المخصص -->
+      <nz-form-item>
+        <nz-form-label>صورة الهوية الوطنية</nz-form-label>
+        <nz-form-control>
+          <upload-Document
+            [lable]="'صورة الهوية'"
+            [IsMultiple]="false"
+            [FileUrl]="urlImageNationalId"
+            [uploadFolder]="'Clients'"
+            (fileChanged)="onIdentityImageChanged($event)">
+          </upload-Document>
+
+          <!-- عرض الصورة الحالية -->
+          <div *ngIf="editedClient.urlImageNationalId && !urlImageNationalId" class="mt-2">
+            <img [src]="editedClient.urlImageNationalId" alt="صورة الهوية الحالية"
+                 class="current-image" style="max-width: 200px; max-height: 150px;" />
+            <div class="text-center mt-1">
+              <small nz-typography nzType="secondary">الصورة الحالية</small>
+            </div>
+          </div>
+
+          <!-- عرض الصورة الجديدة إذا تم رفعها -->
+          <div *ngIf="urlImageNationalId" class="mt-2">
+            <img [src]="urlImageNationalId" alt="صورة الهوية الجديدة"
+                 style="max-width: 200px; max-height: 150px; border: 2px solid #1890ff; padding: 5px;" />
+            <div class="text-center mt-1">
+              <small nz-typography nzType="success">✓ الصورة الجديدة</small>
+            </div>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+
+  <ng-template #editModalFooter>
+    <button nz-button (click)="closeEditModal()">إلغاء</button>
+    <button nz-button nzType="primary"
+            [nzLoading]="isSubmitting"
+            (click)="updateClient()">
+      تحديث البيانات
+    </button>
+  </ng-template>
+</nz-modal>
+
+<!-- Add Role Modal -->
+<nz-modal [(nzVisible)]="isAddRoleModalVisible" nzTitle="إضافة دور جديد"
+          nzWidth="400px" (nzOnCancel)="closeAddRoleModal()"
+          [nzFooter]="addRoleModalFooter">
+
+  <ng-container *nzModalContent>
+    <nz-form-item>
+      <nz-form-label nzRequired>اسم الدور الجديد</nz-form-label>
+      <nz-form-control>
+        <input nz-input [(ngModel)]="newRoleName"
+               placeholder="أدخل اسم الدور الجديد" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-alert nzType="info" nzMessage="سيتم إضافة هذا الدور إلى قائمة الأدوار المتاحة لجميع العملاء"
+              class="mt-3"></nz-alert>
+  </ng-container>
+
+  <ng-template #addRoleModalFooter>
+    <button nz-button (click)="closeAddRoleModal()">إلغاء</button>
+    <button nz-button nzType="primary"
+            [nzLoading]="isRoleSubmitting"
+            [disabled]="!newRoleName.trim()"
+            (click)="addNewRole()">
+      إضافة الدور
+    </button>
+  </ng-template>
+</nz-modal>
+
+<!-- Client Details Modal -->
+<nz-modal [(nzVisible)]="isDetailsModalVisible" nzTitle="تفاصيل العميل"
+          nzWidth="700px" (nzOnCancel)="closeDetailsModal()"
+          [nzFooter]="detailsModalFooter">
+
+  <ng-container *nzModalContent>
+    <div nz-row *ngIf="selectedClient">
+      <div nz-col nzSpan="8" class="text-center">
+        <div class="client-avatar-large">
+          <i nz-icon nzType="user"></i>
+        </div>
+        <h4 class="mt-3">{{selectedClient.fullName}}</h4>
+        <nz-tag [nzColor]="getClientTypeClass(selectedClient.clientType)">
+          {{getClientTypeLabel(selectedClient.clientType)}}
+        </nz-tag>
+      </div>
+      <div nz-col nzSpan="16">
+        <nz-descriptions [nzColumn]="2" nzSize="small">
+          <nz-descriptions-item nzTitle="رقم العميل">
+            {{selectedClient.id || '---'}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="تاريخ الميلاد">
+            {{formatDate(selectedClient.birthDate)}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="نوع العميل">
+            {{getClientTypeLabel(selectedClient.clientType)}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="دور العميل">
+            {{getClientRoleName(selectedClient.clientRoleId)}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="رقم الهاتف">
+            {{selectedClient.phoneNumber}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="البريد الإلكتروني">
+            {{selectedClient.email || '---'}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="العنوان" [nzSpan]="2">
+            {{selectedClient.address || '---'}}
+          </nz-descriptions-item>
+        </nz-descriptions>
+
+        <div *ngIf="selectedClient.urlImageNationalId" class="mt-4 text-center">
+          <nz-divider></nz-divider>
+          <h5>صورة الهوية الوطنية</h5>
+          <img [src]="selectedClient.urlImageNationalId" alt="صورة الهوية"
+               class="details-image" style="max-width: 300px; max-height: 200px;" />
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #detailsModalFooter>
+    <button nz-button (click)="closeDetailsModal()">إغلاق</button>
+    <button nz-button nzType="primary" (click)="openEditModal(selectedClient!)">
+      <i nz-icon nzType="edit"></i>
+      تعديل البيانات
+    </button>
+  </ng-template>
+</nz-modal>
